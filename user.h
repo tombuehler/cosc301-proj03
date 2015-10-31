@@ -37,3 +37,5 @@ void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
 int atoi(const char*);
+int mprotect(void *addr, int len);
+int munprotect(void *addr, int len);

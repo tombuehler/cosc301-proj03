@@ -464,3 +464,40 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int
+kern_mprotect(void *addr, int len)
+{
+  uint newAddr = (uint)addr;
+  if(newAddr % PGSIZE != 0)  
+    return -1;
+  if(newAddr >= proc->sz || newAddr+4 > proc->sz) 
+    return -1;
+  if(len <= 0) 
+    return -1;
+  if(newAddr + (len * PGSIZE) > proc->sz)
+    return -1;
+  if(newAddr < PGSIZE)
+    return -1;
+  do_mprotect(addr, len);
+  return 0;
+} 
+
+int
+kern_munprotect(void *addr, int len)
+{
+  uint newAddr = (uint)addr;
+  if(newAddr % PGSIZE != 0)
+    return -1;
+  if(newAddr >= proc->sz || newAddr+4 > proc->sz)
+    return -1;
+  if(len <= 0)
+    return -1;
+  if(newAddr + (len * PGSIZE) > proc->sz)
+    return -1;
+  if(newAddr < PGSIZE)
+    return -1;
+  do_munprotect(addr, len);
+  return 0;
+}
+

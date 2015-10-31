@@ -17,6 +17,8 @@
 int
 fetchint(uint addr, int *ip)
 {
+  if(proc->pid != 1 && addr < PGSIZE){
+    return -1;}
   if(addr >= proc->sz || addr+4 > proc->sz)
     return -1;
   *ip = *(int*)(addr);
@@ -33,6 +35,8 @@ fetchstr(uint addr, char **pp)
 
   if(addr >= proc->sz)
     return -1;
+  if(proc->pid != 1 && addr < PGSIZE){
+    return -1;}
   *pp = (char*)addr;
   ep = (char*)proc->sz;
   for(s = *pp; s < ep; s++)
@@ -56,6 +60,8 @@ argptr(int n, char **pp, int size)
 {
   int i;
   
+  if(proc->pid != 1 && (uint)i < PGSIZE){
+    return -1;}
   if(argint(n, &i) < 0)
     return -1;
   if((uint)i >= proc->sz || (uint)i+size > proc->sz)
@@ -98,6 +104,9 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sys_mprotect(void); 
+extern int sys_munprotect(void);
+
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -121,6 +130,9 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_mprotect]  sys_mprotect,
+[SYS_munprotect] sys_munprotect,
+
 };
 
 void
